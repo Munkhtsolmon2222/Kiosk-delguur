@@ -179,7 +179,7 @@ export function CartDialog({
           invoice_code: "OSGONMUNKH_S_INVOICE",
           sender_invoice_no: `INV-${Date.now()}`,
           amount: totalPrice,
-          callback_url: "https://kiosk-delguur.vercel.app/callback",
+          callback_url: "https://kiosk-delguur.vercel.app/api/qpay-callback",
         }),
       });
 
