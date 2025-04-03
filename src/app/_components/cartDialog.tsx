@@ -29,6 +29,7 @@ export function CartDialog({
   const [methodError, setMethodError] = useState("");
   const [selected, setSelected] = useState("");
   const [paymentQRImg, setPaymentQRImg] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState(""); // Store payment status (e.g., success or failure)
 
   const [formData, setFormData] = useState({
     address: "",
@@ -178,7 +179,7 @@ export function CartDialog({
           invoice_code: "OSGONMUNKH_S_INVOICE",
           sender_invoice_no: `INV-${Date.now()}`,
           amount: totalPrice,
-          callback_url: "https://yourwebsite.com/qpay-callback",
+          callback_url: "https://kiosk-delguur.vercel.app/callback",
         }),
       });
 
@@ -191,11 +192,16 @@ export function CartDialog({
       const data = await response.json();
       console.log("QPay Invoice Response:", data);
 
-      setPaymentQRImg(data.qr_image);
+      setPaymentQRImg(data.qr_image); // Set the QR code for the user to scan
+
+      // You may also want to store some temporary state for payment status
+      setPaymentStatus("Pending payment confirmation..."); // Show pending until callback is received
     } catch (error) {
       console.error("Error creating QPay invoice:", error);
+      setPaymentStatus("Payment failed to initiate.");
     }
   };
+
   const getStorePayToken = async () => {
     try {
       const response = await fetch("/api/storepay/token", {
@@ -230,7 +236,7 @@ export function CartDialog({
           invoice_code: "MY_INVOICE_CODE",
           sender_invoice_no: `INV-${Date.now()}`,
           amount: totalPrice, // Pass the total price
-          callback_url: "https://yourwebsite.com/callback", // Set your callback URL
+          callback_url: "https://kiosk-delguur.vercel.app/callback", // Set your callback URL
         }),
       });
 
@@ -447,6 +453,11 @@ export function CartDialog({
                     src={`data:image/png;base64,${paymentQRImg}`}
                     alt="QPay QR Code"
                   />
+                  {paymentStatus && (
+                    <div className="mt-4">
+                      <p>{paymentStatus}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div></div>
